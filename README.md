@@ -14,7 +14,7 @@
 
 # 🐦 Kolibry
 
-> Next Generation Frontend Tooling
+> 🛠️🚀 Next Generation Frontend Tooling
 
 - 💡 Instant Server Start
 - ⚡️ Lightning Fast HMR
