@@ -38,7 +38,7 @@ In addition, Kolibry is highly extensible via its [Plugin API](https://kolibry.z
 | Package                                         | Version (click for changelogs)                                                                                                    |
 | ----------------------------------------------- | :-------------------------------------------------------------------------------------------------------------------------------- |
 | [kolibry](packages/kolibry)                           | [![kolibry version](https://img.shields.io/npm/v/kolibry.svg?label=%20&colorB=14F195)](packages/kolibry/CHANGELOG.md)                                    |
-| [@kolibryjs/plugin-legacy](packages/plugin-legacy) | [![plugin-legacy version](https://img.shields.io/npm/v/@kolibryjs/plugin-legacy.svg?label=%20&colorB=14F195)](packages/plugin-legacy/CHANGELOG.md) |
+| [@kolibryjs/legacy-plugin](packages/legacy-plugin) | [![legacy-plugin version](https://img.shields.io/npm/v/@kolibryjs/legacy-plugin.svg?label=%20&colorB=14F195)](packages/legacy-plugin/CHANGELOG.md) |
 
 ## 🤝 Contribution
 

@@ -1,4 +1,4 @@
-# 🐦 @kolibryjs/plugin-legacy [![npm](https://img.shields.io/npm/v/@kolibryjs/plugin-legacy.svg?style=flat&colorA=18181B&colorB=14F195)](https://npmjs.com/package/@kolibryjs/plugin-legacy)
+# 🐦 @kolibryjs/legacy-plugin [![npm](https://img.shields.io/npm/v/@kolibryjs/legacy-plugin.svg?style=flat&colorA=18181B&colorB=14F195)](https://npmjs.com/package/@kolibryjs/legacy-plugin)
 
 Kolibry's default browser support baseline is [Native ESM](https://caniuse.com/es6-module), [native ESM dynamic import](https://caniuse.com/es6-module-dynamic-import), and [`import.meta`](https://caniuse.com/mdn-javascript_operators_import_meta). This plugin provides support for legacy browsers that do not support those features when building for production.
 
@@ -16,18 +16,18 @@ By default, this plugin will:
 
 ```ts
 // kolibry.config.js
-import legacy from '@kolibryjs/plugin-legacy'
+import legacy from '@kolibryjs/legacy-plugin'
 
 export default {
-  plugins: [
-    legacy({
-      targets: ['defaults', 'not IE 11'],
-    }),
-  ],
+   plugins: [
+      legacy({
+         targets: ['defaults', 'not IE 11'],
+      }),
+   ],
 }
 ```
 
-Terser must be installed because plugin-legacy uses Terser for minification.
+Terser must be installed because legacy-plugin uses Terser for minification.
 
 ```sh
 npm add -D terser
@@ -96,17 +96,17 @@ npm add -D terser
   Set to `false` to disable legacy chunks. This is only useful if you are using `modernPolyfills`, which essentially allows you to use this plugin for injecting polyfills to the modern build only:
 
   ```ts
-  import legacy from '@kolibryjs/plugin-legacy'
+  import legacy from '@kolibryjs/legacy-plugin'
 
   export default {
-    plugins: [
-      legacy({
-        modernPolyfills: [
-          /* ... */
-        ],
-        renderLegacyChunks: false,
-      }),
-    ],
+     plugins: [
+        legacy({
+           modernPolyfills: [
+              /* ... */
+           ],
+           renderLegacyChunks: false,
+        }),
+     ],
   }
   ```
 
@@ -141,15 +141,15 @@ Polyfill specifier strings for `polyfills` and `modernPolyfills` can be either o
 **Example**
 
 ```ts
-import legacy from '@kolibryjs/plugin-legacy'
+import legacy from '@kolibryjs/legacy-plugin'
 
 export default {
-  plugins: [
-    legacy({
-      polyfills: ['es.promise.finally', 'es/map', 'es/set'],
-      modernPolyfills: ['es.promise.finally'],
-    }),
-  ],
+   plugins: [
+      legacy({
+         polyfills: ['es.promise.finally', 'es/map', 'es/set'],
+         modernPolyfills: ['es.promise.finally'],
+      }),
+   ],
 }
 ```
 
@@ -163,13 +163,13 @@ The legacy plugin requires inline scripts for [Safari 10.1 `nomodule` fix](https
 - `sha256-+5XkZFazzJo8n0iOP4ti/cLCMUudTf//Mzkb7xNPXIc=`
 
 <!--
-Run `node --input-type=module -e "import {cspHashes} from '@kolibryjs/plugin-legacy'; console.log(cspHashes.map(h => 'sha256-'+h))"` to retrieve the value.
+Run `node --input-type=module -e "import {cspHashes} from '@kolibryjs/legacy-plugin'; console.log(cspHashes.map(h => 'sha256-'+h))"` to retrieve the value.
 -->
 
 These values (without the `sha256-` prefix) can also be retrieved via
 
 ```ts
-import { cspHashes } from '@kolibryjs/plugin-legacy'
+import { cspHashes } from '@kolibryjs/legacy-plugin'
 ```
 
 When using the `regenerator-runtime` polyfill, it will attempt to use the `globalThis` object to register itself. If `globalThis` is not available (it is [fairly new](https://caniuse.com/?search=globalThis) and not widely supported, including IE 11), it attempts to perform dynamic `Function(...)` call which violates the CSP. To avoid dynamic `eval` in the absence of `globalThis` consider adding `core-js/proposals/global-this` to `additionalLegacyPolyfills` to define it.
