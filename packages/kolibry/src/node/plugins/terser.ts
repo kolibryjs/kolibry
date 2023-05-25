@@ -53,7 +53,7 @@ export function terserPlugin(config: ResolvedConfig): Plugin {
       // can use terser.
          if (
             config.build.minify !== 'terser'
-        // @ts-expect-error injected by @kolibryjs/plugin-legacy
+        // @ts-expect-error injected by @kolibryjs/legacy-plugin
         && !outputOptions.__kolibry_force_terser__
          )
             return null
