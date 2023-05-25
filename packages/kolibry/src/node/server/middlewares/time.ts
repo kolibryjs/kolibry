@@ -5,14 +5,14 @@ import { createDebugger, prettifyUrl, timeFrom } from '../../utils'
 const logTime = createDebugger('kolibry:time')
 
 export function timeMiddleware(root: string): Connect.NextHandleFunction {
-  // Keep the named function. The name is visible in debug logs via `DEBUG=connect:dispatcher ...`
-  return function kolibryTimeMiddleware(req, res, next) {
-    const start = performance.now()
-    const end = res.end
-    res.end = (...args: readonly [any, any?, any?]) => {
-      logTime?.(`${timeFrom(start)} ${prettifyUrl(req.url!, root)}`)
-      return end.call(res, ...args)
-    }
-    next()
-  }
+   // Keep the named function. The name is visible in debug logs via `DEBUG=connect:dispatcher ...`
+   return function kolibryTimeMiddleware(req, res, next) {
+      const start = performance.now()
+      const end = res.end
+      res.end = (...args: readonly [any, any?, any?]) => {
+         logTime?.(`${timeFrom(start)} ${prettifyUrl(req.url!, root)}`)
+         return end.call(res, ...args)
+      }
+      next()
+   }
 }

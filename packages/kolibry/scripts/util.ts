@@ -8,67 +8,69 @@ import MagicString from 'wizard-string'
 import consolji from 'consolji'
 
 export function rewriteImports(
-  fileOrDir: string,
-  rewrite: (importPath: string, currentFile: string) => string | void,
+   fileOrDir: string,
+   rewrite: (importPath: string, currentFile: string) => string | void,
 ): void {
-  walkDir(fileOrDir, (file) => {
-    rewriteFileImports(file, (importPath) => {
-      return rewrite(importPath, file)
-    })
-  })
+   walkDir(fileOrDir, (file) => {
+      rewriteFileImports(file, (importPath) => {
+         return rewrite(importPath, file)
+      })
+   })
 }
 
 const windowsSlashRE = /\\/g
 export function slash(p: string): string {
-  return p.replace(windowsSlashRE, '/')
+   return p.replace(windowsSlashRE, '/')
 }
 
 export function walkDir(dir: string, handleFile: (file: string) => void): void {
-  if (statSync(dir).isDirectory()) {
-    const files = readdirSync(dir)
-    for (const file of files) {
-      const resolved = resolve(dir, file)
-      walkDir(resolved, handleFile)
-    }
-  } else {
-    handleFile(dir)
-  }
+   if (statSync(dir).isDirectory()) {
+      const files = readdirSync(dir)
+      for (const file of files) {
+         const resolved = resolve(dir, file)
+         walkDir(resolved, handleFile)
+      }
+   }
+   else {
+      handleFile(dir)
+   }
 }
 
 function rewriteFileImports(
-  file: string,
-  rewrite: (importPath: string) => string | void,
+   file: string,
+   rewrite: (importPath: string) => string | void,
 ): void {
-  const content = readFileSync(file, 'utf-8')
-  const str = new MagicString(content)
-  let ast: ParseResult<File>
-  try {
-    ast = parse(content, {
-      sourceType: 'module',
-      plugins: ['typescript', 'classProperties'],
-    })
-  } catch (e) {
-    consolji.error(colors.red(`failed to parse ${file}`))
-    throw e
-  }
-  for (const statement of ast.program.body) {
-    if (
-      statement.type === 'ImportDeclaration' ||
-      statement.type === 'ExportNamedDeclaration' ||
-      statement.type === 'ExportAllDeclaration'
-    ) {
-      const source = statement.source
-      if (source?.value) {
-        const newImportPath = rewrite(source.value)
-        if (newImportPath) {
-          str.overwrite(
-            source.start!,
-            source.end!,
-            JSON.stringify(newImportPath),
-          )
-        }
+   const content = readFileSync(file, 'utf-8')
+   const str = new MagicString(content)
+   let ast: ParseResult<File>
+   try {
+      ast = parse(content, {
+         sourceType: 'module',
+         plugins: ['typescript', 'classProperties'],
+      })
+   }
+   catch (e) {
+      consolji.error(colors.red(`failed to parse ${file}`))
+      throw e
+   }
+   for (const statement of ast.program.body) {
+      if (
+         statement.type === 'ImportDeclaration'
+      || statement.type === 'ExportNamedDeclaration'
+      || statement.type === 'ExportAllDeclaration'
+      ) {
+         const source = statement.source
+         if (source?.value) {
+            const newImportPath = rewrite(source.value)
+            if (newImportPath) {
+               str.overwrite(
+                  source.start!,
+                  source.end!,
+                  JSON.stringify(newImportPath),
+               )
+            }
+         }
       }
-    }
-  }
-  writeFileSync(file, str.toString())
+   }
+   writeFileSync(file, str.toString())
 }

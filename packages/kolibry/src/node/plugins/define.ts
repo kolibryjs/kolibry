@@ -10,171 +10,168 @@ const metaEnvRe = /import\.meta\.env\.(.+)/
 const isNonJsRequest = (request: string): boolean => nonJsRe.test(request)
 
 export function definePlugin(config: ResolvedConfig): Plugin {
-  const isBuild = config.command === 'build'
-  const isBuildLib = isBuild && config.build.lib
+   const isBuild = config.command === 'build'
+   const isBuildLib = isBuild && config.build.lib
 
-  // ignore replace process.env in lib build
-  const processEnv: Record<string, string> = {}
-  const processNodeEnv: Record<string, string> = {}
-  if (!isBuildLib) {
-    const nodeEnv = process.env.NODE_ENV || config.mode
-    Object.assign(processEnv, {
-      'process.env.': `({}).`,
-      'global.process.env.': `({}).`,
-      'globalThis.process.env.': `({}).`,
-    })
-    Object.assign(processNodeEnv, {
-      'process.env.NODE_ENV': JSON.stringify(nodeEnv),
-      'global.process.env.NODE_ENV': JSON.stringify(nodeEnv),
-      'globalThis.process.env.NODE_ENV': JSON.stringify(nodeEnv),
-      __kolibry_process_env_NODE_ENV: JSON.stringify(nodeEnv),
-    })
-  }
+   // ignore replace process.env in lib build
+   const processEnv: Record<string, string> = {}
+   const processNodeEnv: Record<string, string> = {}
+   if (!isBuildLib) {
+      const nodeEnv = process.env.NODE_ENV || config.mode
+      Object.assign(processEnv, {
+         'process.env.': '({}).',
+         'global.process.env.': '({}).',
+         'globalThis.process.env.': '({}).',
+      })
+      Object.assign(processNodeEnv, {
+         'process.env.NODE_ENV': JSON.stringify(nodeEnv),
+         'global.process.env.NODE_ENV': JSON.stringify(nodeEnv),
+         'globalThis.process.env.NODE_ENV': JSON.stringify(nodeEnv),
+         '__kolibry_process_env_NODE_ENV': JSON.stringify(nodeEnv),
+      })
+   }
 
-  const userDefine: Record<string, string> = {}
-  const userDefineEnv: Record<string, string> = {}
-  for (const key in config.define) {
-    const val = config.define[key]
-    userDefine[key] = typeof val === 'string' ? val : JSON.stringify(val)
+   const userDefine: Record<string, string> = {}
+   const userDefineEnv: Record<string, string> = {}
+   for (const key in config.define) {
+      const val = config.define[key]
+      userDefine[key] = typeof val === 'string' ? val : JSON.stringify(val)
 
-    // make sure `import.meta.env` object has user define properties
-    if (isBuild) {
-      const match = key.match(metaEnvRe)
-      if (match) {
-        userDefineEnv[match[1]] = `__kolibry__define__${userDefine[key]}`
+      // make sure `import.meta.env` object has user define properties
+      if (isBuild) {
+         const match = key.match(metaEnvRe)
+         if (match)
+            userDefineEnv[match[1]] = `__kolibry__define__${userDefine[key]}`
       }
-    }
-  }
+   }
 
-  // during dev, import.meta properties are handled by importAnalysis plugin.
-  const importMetaKeys: Record<string, string> = {}
-  const importMetaFallbackKeys: Record<string, string> = {}
-  if (isBuild) {
-    // set here to allow override with config.define
-    importMetaKeys['import.meta.hot'] = `undefined`
-    for (const key in config.env) {
-      importMetaKeys[`import.meta.env.${key}`] = JSON.stringify(config.env[key])
-    }
-    Object.assign(importMetaFallbackKeys, {
-      'import.meta.env.': `({}).`,
-      'import.meta.env': JSON.stringify({
-        ...config.env,
-        SSR: '__kolibry__ssr__',
-        ...userDefineEnv,
-      }).replace(
-        /"__kolibry__define__(.+?)"([,}])/g,
-        (_, val, suffix) => `${val.replace(/(^\\")|(\\"$)/g, '"')}${suffix}`,
-      ),
-    })
-  }
+   // during dev, import.meta properties are handled by importAnalysis plugin.
+   const importMetaKeys: Record<string, string> = {}
+   const importMetaFallbackKeys: Record<string, string> = {}
+   if (isBuild) {
+      // set here to allow override with config.define
+      importMetaKeys['import.meta.hot'] = 'undefined'
+      for (const key in config.env)
+         importMetaKeys[`import.meta.env.${key}`] = JSON.stringify(config.env[key])
 
-  function getImportMetaKeys(ssr: boolean): Record<string, string> {
-    if (!isBuild) return {}
-    return {
-      ...importMetaKeys,
-      'import.meta.env.SSR': ssr + '',
-    }
-  }
+      Object.assign(importMetaFallbackKeys, {
+         'import.meta.env.': '({}).',
+         'import.meta.env': JSON.stringify({
+            ...config.env,
+            SSR: '__kolibry__ssr__',
+            ...userDefineEnv,
+         }).replace(
+            /"__kolibry__define__(.+?)"([,}])/g,
+            (_, val, suffix) => `${val.replace(/(^\\")|(\\"$)/g, '"')}${suffix}`,
+         ),
+      })
+   }
 
-  function getImportMetaFallbackKeys(ssr: boolean): Record<string, string> {
-    if (!isBuild) return {}
-    return {
-      ...importMetaFallbackKeys,
-      'import.meta.env': importMetaFallbackKeys['import.meta.env'].replace(
-        '"__kolibry__ssr__"',
-        ssr + '',
-      ),
-    }
-  }
+   function getImportMetaKeys(ssr: boolean): Record<string, string> {
+      if (!isBuild)
+         return {}
+      return {
+         ...importMetaKeys,
+         'import.meta.env.SSR': `${ssr}`,
+      }
+   }
 
-  function generatePattern(
-    ssr: boolean,
-  ): [Record<string, string | undefined>, RegExp | null] {
-    const replaceProcessEnv = !ssr || config.ssr?.target === 'webworker'
+   function getImportMetaFallbackKeys(ssr: boolean): Record<string, string> {
+      if (!isBuild)
+         return {}
+      return {
+         ...importMetaFallbackKeys,
+         'import.meta.env': importMetaFallbackKeys['import.meta.env'].replace(
+            '"__kolibry__ssr__"',
+            `${ssr}`,
+         ),
+      }
+   }
 
-    const replacements: Record<string, string> = {
-      ...(replaceProcessEnv ? processNodeEnv : {}),
-      ...getImportMetaKeys(ssr),
-      ...userDefine,
-      ...getImportMetaFallbackKeys(ssr),
-      ...(replaceProcessEnv ? processEnv : {}),
-    }
+   function generatePattern(
+      ssr: boolean,
+   ): [Record<string, string | undefined>, RegExp | null] {
+      const replaceProcessEnv = !ssr || config.ssr?.target === 'webworker'
 
-    if (isBuild && !replaceProcessEnv) {
-      replacements['__kolibry_process_env_NODE_ENV'] = 'process.env.NODE_ENV'
-    }
-
-    const replacementsKeys = Object.keys(replacements)
-    const pattern = replacementsKeys.length
-      ? new RegExp(
-          // Mustn't be preceded by a char that can be part of an identifier
-          // or a '.' that isn't part of a spread operator
-          '(?<![\\p{L}\\p{N}_$]|(?<!\\.\\.)\\.)(' +
-            replacementsKeys.map(escapeRegex).join('|') +
-            // Mustn't be followed by a char that can be part of an identifier
-            // or an assignment (but allow equality operators)
-            ')(?:(?<=\\.)|(?![\\p{L}\\p{N}_$]|\\s*?=[^=]))',
-          'gu',
-        )
-      : null
-
-    return [replacements, pattern]
-  }
-
-  const defaultPattern = generatePattern(false)
-  const ssrPattern = generatePattern(true)
-
-  return {
-    name: 'kolibry:define',
-
-    transform(code, id, options) {
-      const ssr = options?.ssr === true
-      if (!ssr && !isBuild) {
-        // for dev we inject actual global defines in the kolibry client to
-        // avoid the transform cost.
-        return
+      const replacements: Record<string, string> = {
+         ...(replaceProcessEnv ? processNodeEnv : {}),
+         ...getImportMetaKeys(ssr),
+         ...userDefine,
+         ...getImportMetaFallbackKeys(ssr),
+         ...(replaceProcessEnv ? processEnv : {}),
       }
 
-      if (
-        // exclude html, css and static assets for performance
-        isHTMLRequest(id) ||
-        isCSSRequest(id) ||
-        isNonJsRequest(id) ||
-        config.assetsInclude(id)
-      ) {
-        return
-      }
+      if (isBuild && !replaceProcessEnv)
+         replacements.__kolibry_process_env_NODE_ENV = 'process.env.NODE_ENV'
 
-      const [replacements, pattern] = ssr ? ssrPattern : defaultPattern
+      const replacementsKeys = Object.keys(replacements)
+      const pattern = replacementsKeys.length
+         ? new RegExp(
+            // Mustn't be preceded by a char that can be part of an identifier
+            // or a '.' that isn't part of a spread operator
+            `(?<![\\p{L}\\p{N}_$]|(?<!\\.\\.)\\.)(${
+             replacementsKeys.map(escapeRegex).join('|')
+               // Mustn't be followed by a char that can be part of an identifier
+               // or an assignment (but allow equality operators)
+             })(?:(?<=\\.)|(?![\\p{L}\\p{N}_$]|\\s*?=[^=]))`,
+            'gu',
+         )
+         : null
 
-      if (!pattern) {
-        return null
-      }
+      return [replacements, pattern]
+   }
 
-      if (ssr && !isBuild) {
-        // ssr + dev, simple replace
-        return code.replace(pattern, (_, match) => {
-          return '' + replacements[match]
-        })
-      }
+   const defaultPattern = generatePattern(false)
+   const ssrPattern = generatePattern(true)
 
-      const s = new WizardString(code)
-      let hasReplaced = false
-      let match: RegExpExecArray | null
+   return {
+      name: 'kolibry:define',
 
-      while ((match = pattern.exec(code))) {
-        hasReplaced = true
-        const start = match.index
-        const end = start + match[0].length
-        const replacement = '' + replacements[match[1]]
-        s.update(start, end, replacement)
-      }
+      transform(code, id, options) {
+         const ssr = options?.ssr === true
+         if (!ssr && !isBuild) {
+            // for dev we inject actual global defines in the kolibry client to
+            // avoid the transform cost.
+            return
+         }
 
-      if (!hasReplaced) {
-        return null
-      }
+         if (
+         // exclude html, css and static assets for performance
+            isHTMLRequest(id)
+        || isCSSRequest(id)
+        || isNonJsRequest(id)
+        || config.assetsInclude(id)
+         )
+            return
 
-      return transformStableResult(s, id, config)
-    },
-  }
+         const [replacements, pattern] = ssr ? ssrPattern : defaultPattern
+
+         if (!pattern)
+            return null
+
+         if (ssr && !isBuild) {
+            // ssr + dev, simple replace
+            return code.replace(pattern, (_, match) => {
+               return `${replacements[match]}`
+            })
+         }
+
+         const s = new WizardString(code)
+         let hasReplaced = false
+         let match: RegExpExecArray | null
+
+         while ((match = pattern.exec(code))) {
+            hasReplaced = true
+            const start = match.index
+            const end = start + match[0].length
+            const replacement = `${replacements[match[1]]}`
+            s.update(start, end, replacement)
+         }
+
+         if (!hasReplaced)
+            return null
+
+         return transformStableResult(s, id, config)
+      },
+   }
 }

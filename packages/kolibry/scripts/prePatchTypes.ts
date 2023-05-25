@@ -1,8 +1,8 @@
 import { dirname, relative, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import colors from '@nyxb/picocolors'
-import { rewriteImports, slash } from './util'
 import consolji from 'consolji'
+import { rewriteImports, slash } from './util'
 
 const dir = dirname(fileURLToPath(import.meta.url))
 const tempDir = resolve(dir, '../temp/node')
@@ -12,13 +12,13 @@ const depTypesDir = resolve(dir, '../src/types')
 // and rewrite them into relative imports - so that api-extractor actually
 // includes them in the rolled-up final d.ts file.
 rewriteImports(tempDir, (importPath, currentFile) => {
-  if (importPath.startsWith('dep-types/')) {
-    const absoluteTypePath = resolve(
-      depTypesDir,
-      importPath.slice('dep-types/'.length),
-    )
-    return slash(relative(dirname(currentFile), absoluteTypePath))
-  }
+   if (importPath.startsWith('dep-types/')) {
+      const absoluteTypePath = resolve(
+         depTypesDir,
+         importPath.slice('dep-types/'.length),
+      )
+      return slash(relative(dirname(currentFile), absoluteTypePath))
+   }
 })
 
-consolji.log(colors.nicegreen(colors.bold(`patched deps-types/* imports`)))
+consolji.log(colors.nicegreen(colors.bold('patched deps-types/* imports')))

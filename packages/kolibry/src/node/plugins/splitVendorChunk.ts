@@ -1,8 +1,8 @@
 import type {
-  GetManualChunk,
-  GetModuleInfo,
-  ManualChunkMeta,
-  OutputOptions,
+   GetManualChunk,
+   GetModuleInfo,
+   ManualChunkMeta,
+   OutputOptions,
 } from 'rollup'
 import { isInNodeModules } from '../utils'
 import type { UserConfig } from '../../node'
@@ -11,11 +11,11 @@ import type { Plugin } from '../plugin'
 // This file will be built for both ESM and CJS. Avoid relying on other modules as possible.
 
 // copy from constants.ts
-const CSS_LANGS_RE =
-  // eslint-disable-next-line regexp/no-unused-capturing-group
-  /\.(css|less|sass|scss|styl|stylus|pcss|postcss|sss)(?:$|\?)/
-export const isCSSRequest = (request: string): boolean =>
-  CSS_LANGS_RE.test(request)
+const CSS_LANGS_RE
+  = /\.(css|less|sass|scss|styl|stylus|pcss|postcss|sss)(?:$|\?)/
+export function isCSSRequest(request: string): boolean {
+   return CSS_LANGS_RE.test(request)
+}
 
 // Use splitVendorChunkPlugin() to get the same manualChunks strategy as Kolibry 2.7
 // We don't recommend using this strategy as a general solution moving forward
@@ -27,114 +27,115 @@ export const isCSSRequest = (request: string): boolean =>
 // Don't use this manualChunks strategy for ssr, lib mode, and 'umd' or 'iife'
 
 export class SplitVendorChunkCache {
-  cache: Map<string, boolean>
-  constructor() {
-    this.cache = new Map<string, boolean>()
-  }
-  reset(): void {
-    this.cache = new Map<string, boolean>()
-  }
+   cache: Map<string, boolean>
+   constructor() {
+      this.cache = new Map<string, boolean>()
+   }
+
+   reset(): void {
+      this.cache = new Map<string, boolean>()
+   }
 }
 
 export function splitVendorChunk(
-  options: { cache?: SplitVendorChunkCache } = {},
+   options: { cache?: SplitVendorChunkCache } = {},
 ): GetManualChunk {
-  const cache = options.cache ?? new SplitVendorChunkCache()
-  return (id, { getModuleInfo }) => {
-    if (
-      isInNodeModules(id) &&
-      !isCSSRequest(id) &&
-      staticImportedByEntry(id, getModuleInfo, cache.cache)
-    ) {
-      return 'vendor'
-    }
-  }
+   const cache = options.cache ?? new SplitVendorChunkCache()
+   return (id, { getModuleInfo }) => {
+      if (
+         isInNodeModules(id)
+      && !isCSSRequest(id)
+      && staticImportedByEntry(id, getModuleInfo, cache.cache)
+      )
+         return 'vendor'
+   }
 }
 
 function staticImportedByEntry(
-  id: string,
-  getModuleInfo: GetModuleInfo,
-  cache: Map<string, boolean>,
-  importStack: string[] = [],
+   id: string,
+   getModuleInfo: GetModuleInfo,
+   cache: Map<string, boolean>,
+   importStack: string[] = [],
 ): boolean {
-  if (cache.has(id)) {
-    return cache.get(id) as boolean
-  }
-  if (importStack.includes(id)) {
-    // circular deps!
-    cache.set(id, false)
-    return false
-  }
-  const mod = getModuleInfo(id)
-  if (!mod) {
-    cache.set(id, false)
-    return false
-  }
+   if (cache.has(id))
+      return cache.get(id) as boolean
 
-  if (mod.isEntry) {
-    cache.set(id, true)
-    return true
-  }
-  const someImporterIs = mod.importers.some((importer) =>
-    staticImportedByEntry(
-      importer,
-      getModuleInfo,
-      cache,
-      importStack.concat(id),
-    ),
-  )
-  cache.set(id, someImporterIs)
-  return someImporterIs
+   if (importStack.includes(id)) {
+      // circular deps!
+      cache.set(id, false)
+      return false
+   }
+   const mod = getModuleInfo(id)
+   if (!mod) {
+      cache.set(id, false)
+      return false
+   }
+
+   if (mod.isEntry) {
+      cache.set(id, true)
+      return true
+   }
+   const someImporterIs = mod.importers.some(importer =>
+      staticImportedByEntry(
+         importer,
+         getModuleInfo,
+         cache,
+         importStack.concat(id),
+      ),
+   )
+   cache.set(id, someImporterIs)
+   return someImporterIs
 }
 
 export function splitVendorChunkPlugin(): Plugin {
-  const caches: SplitVendorChunkCache[] = []
-  function createSplitVendorChunk(output: OutputOptions, config: UserConfig) {
-    const cache = new SplitVendorChunkCache()
-    caches.push(cache)
-    const build = config.build ?? {}
-    const format = output?.format
-    if (!build.ssr && !build.lib && format !== 'umd' && format !== 'iife') {
-      return splitVendorChunk({ cache })
-    }
-  }
-  return {
-    name: 'kolibry:split-vendor-chunk',
-    config(config) {
-      let outputs = config?.build?.rollupOptions?.output
-      if (outputs) {
-        outputs = Array.isArray(outputs) ? outputs : [outputs]
-        for (const output of outputs) {
-          const kolibryManualChunks = createSplitVendorChunk(output, config)
-          if (kolibryManualChunks) {
-            if (output.manualChunks) {
-              if (typeof output.manualChunks === 'function') {
-                const userManualChunks = output.manualChunks
-                output.manualChunks = (id: string, api: ManualChunkMeta) => {
-                  return userManualChunks(id, api) ?? kolibryManualChunks(id, api)
-                }
-              }
-              // else, leave the object form of manualChunks untouched, as
-              // we can't safely replicate rollup handling.
-            } else {
-              output.manualChunks = kolibryManualChunks
+   const caches: SplitVendorChunkCache[] = []
+   function createSplitVendorChunk(output: OutputOptions, config: UserConfig) {
+      const cache = new SplitVendorChunkCache()
+      caches.push(cache)
+      const build = config.build ?? {}
+      const format = output?.format
+      if (!build.ssr && !build.lib && format !== 'umd' && format !== 'iife')
+         return splitVendorChunk({ cache })
+   }
+   return {
+      name: 'kolibry:split-vendor-chunk',
+      config(config) {
+         let outputs = config?.build?.rollupOptions?.output
+         if (outputs) {
+            outputs = Array.isArray(outputs) ? outputs : [outputs]
+            for (const output of outputs) {
+               const kolibryManualChunks = createSplitVendorChunk(output, config)
+               if (kolibryManualChunks) {
+                  if (output.manualChunks) {
+                     if (typeof output.manualChunks === 'function') {
+                        const userManualChunks = output.manualChunks
+                        output.manualChunks = (id: string, api: ManualChunkMeta) => {
+                           return userManualChunks(id, api) ?? kolibryManualChunks(id, api)
+                        }
+                     }
+                     // else, leave the object form of manualChunks untouched, as
+                     // we can't safely replicate rollup handling.
+                  }
+                  else {
+                     output.manualChunks = kolibryManualChunks
+                  }
+               }
             }
-          }
-        }
-      } else {
-        return {
-          build: {
-            rollupOptions: {
-              output: {
-                manualChunks: createSplitVendorChunk({}, config),
-              },
-            },
-          },
-        }
-      }
-    },
-    buildStart() {
-      caches.forEach((cache) => cache.reset())
-    },
-  }
+         }
+         else {
+            return {
+               build: {
+                  rollupOptions: {
+                     output: {
+                        manualChunks: createSplitVendorChunk({}, config),
+                     },
+                  },
+               },
+            }
+         }
+      },
+      buildStart() {
+         caches.forEach(cache => cache.reset())
+      },
+   }
 }

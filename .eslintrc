@@ -1,7 +1,23 @@
 {
    "extends": ["@nyxb"],
    "rules": {
-     "@next/next/no-html-link-for-pages": 0
+      "@typescript-eslint/no-invalid-this": 0,
+      "no-new": 0,
+      "import/no-mutable-exports": 0,
+      "no-mixed-operators": 0,
+      "curly": 0,
+      "@typescript-eslint/ban-ts-comment": 0,
+      "import/default": 0,
+      "array-callback-return": 0,
+      "no-cond-assign": 0,
+      "@next/next/no-assign-module-variable": 0,
+      "unused-imports/no-unused-vars": 0,
+      "promise/param-names": 0,
+      "eslint-comments/no-unlimited-disable": 0,
+      "no-template-curly-in-string": 0,
+      "no-new-func": 0,
+      "n/prefer-global/buffer": 0,
+      "@next/next/no-html-link-for-pages": 0
    },
    "settings": {
       "react": {

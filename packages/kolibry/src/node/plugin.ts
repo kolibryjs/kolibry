@@ -1,20 +1,21 @@
 import type {
-  CustomPluginOptions,
-  LoadResult,
-  ObjectHook,
-  PluginContext,
-  ResolveIdResult,
-  Plugin as RollupPlugin,
-  TransformPluginContext,
-  TransformResult,
+   CustomPluginOptions,
+   LoadResult,
+   ObjectHook,
+   PluginContext,
+   ResolveIdResult,
+   Plugin as RollupPlugin,
+   TransformPluginContext,
+   TransformResult,
 } from 'rollup'
-export type { PluginContext } from 'rollup'
 import type { ConfigEnv, ResolvedConfig, UserConfig } from './config'
 import type { ServerHook } from './server'
 import type { IndexHtmlTransform } from './plugins/html'
 import type { ModuleNode } from './server/moduleGraph'
 import type { HmrContext } from './server/hmr'
 import type { PreviewServerHook } from './preview'
+
+export type { PluginContext } from 'rollup'
 
 /**
  * Kolibry plugins extends the Rollup plugin interface with a few extra
@@ -38,7 +39,7 @@ import type { PreviewServerHook } from './preview'
  * config file can be used to conditional determine the plugins to use.
  */
 export interface Plugin extends RollupPlugin {
-  /**
+   /**
    * Enforce plugin invocation tier similar to webpack loaders.
    *
    * Plugin invocation order:
@@ -50,15 +51,15 @@ export interface Plugin extends RollupPlugin {
    * - `enforce: 'post'` plugins
    * - kolibry build post plugins
    */
-  enforce?: 'pre' | 'post'
-  /**
+   enforce?: 'pre' | 'post'
+   /**
    * Apply the plugin only for serve or build, or on certain conditions.
    */
-  apply?:
-    | 'serve'
-    | 'build'
-    | ((this: void, config: UserConfig, env: ConfigEnv) => boolean)
-  /**
+   apply?:
+   | 'serve'
+   | 'build'
+   | ((this: void, config: UserConfig, env: ConfigEnv) => boolean)
+   /**
    * Modify kolibry config before it's resolved. The hook can either mutate the
    * passed-in config directly, or return a partial config object that will be
    * deeply merged into existing config.
@@ -66,17 +67,17 @@ export interface Plugin extends RollupPlugin {
    * Note: User plugins are resolved before running this hook so injecting other
    * plugins inside  the `config` hook will have no effect.
    */
-  config?: ObjectHook<
+   config?: ObjectHook<
     (
-      this: void,
-      config: UserConfig,
-      env: ConfigEnv,
+       this: void,
+       config: UserConfig,
+       env: ConfigEnv,
     ) => UserConfig | null | void | Promise<UserConfig | null | void>
   >
   /**
    * Use this hook to read and store the final resolved kolibry config.
    */
-  configResolved?: ObjectHook<
+   configResolved?: ObjectHook<
     (this: void, config: ResolvedConfig) => void | Promise<void>
   >
   /**
@@ -88,8 +89,8 @@ export interface Plugin extends RollupPlugin {
    * can return a post hook that will be called after internal middlewares
    * are applied. Hook can be async functions and will be called in series.
    */
-  configureServer?: ObjectHook<ServerHook>
-  /**
+   configureServer?: ObjectHook<ServerHook>
+   /**
    * Configure the preview server. The hook receives the {@link PreviewServerForHook}
    * instance. This can also be used to store a reference to the server
    * for use in other hooks.
@@ -98,8 +99,8 @@ export interface Plugin extends RollupPlugin {
    * return a post hook that will be called after other middlewares are
    * applied. Hooks can be async functions and will be called in series.
    */
-  configurePreviewServer?: ObjectHook<PreviewServerHook>
-  /**
+   configurePreviewServer?: ObjectHook<PreviewServerHook>
+   /**
    * Transform index.html.
    * The hook receives the following arguments:
    *
@@ -114,8 +115,8 @@ export interface Plugin extends RollupPlugin {
    * transform. If you need to apply the transform before kolibry, use an object:
    * `{ order: 'pre', handler: hook }`
    */
-  transformIndexHtml?: IndexHtmlTransform
-  /**
+   transformIndexHtml?: IndexHtmlTransform
+   /**
    * Perform custom handling of HMR updates.
    * The handler receives a context containing changed filename, timestamp, a
    * list of modules affected by the file change, and the dev server instance.
@@ -130,46 +131,46 @@ export interface Plugin extends RollupPlugin {
    * - If the hook doesn't return a value, the hmr update will be performed as
    *   normal.
    */
-  handleHotUpdate?: ObjectHook<
+   handleHotUpdate?: ObjectHook<
     (
-      this: void,
-      ctx: HmrContext,
+       this: void,
+       ctx: HmrContext,
     ) => Array<ModuleNode> | void | Promise<Array<ModuleNode> | void>
   >
 
-  /**
+   /**
    * extend hooks with ssr flag
    */
-  resolveId?: ObjectHook<
+   resolveId?: ObjectHook<
     (
-      this: PluginContext,
-      source: string,
-      importer: string | undefined,
-      options: {
-        assertions: Record<string, string>
-        custom?: CustomPluginOptions
-        ssr?: boolean
-        /**
+       this: PluginContext,
+       source: string,
+       importer: string | undefined,
+       options: {
+          assertions: Record<string, string>
+          custom?: CustomPluginOptions
+          ssr?: boolean
+          /**
          * @internal
          */
-        scan?: boolean
-        isEntry: boolean
-      },
+          scan?: boolean
+          isEntry: boolean
+       },
     ) => Promise<ResolveIdResult> | ResolveIdResult
   >
-  load?: ObjectHook<
+   load?: ObjectHook<
     (
-      this: PluginContext,
-      id: string,
-      options?: { ssr?: boolean },
+       this: PluginContext,
+       id: string,
+       options?: { ssr?: boolean },
     ) => Promise<LoadResult> | LoadResult
   >
-  transform?: ObjectHook<
+   transform?: ObjectHook<
     (
-      this: TransformPluginContext,
-      code: string,
-      id: string,
-      options?: { ssr?: boolean },
+       this: TransformPluginContext,
+       code: string,
+       id: string,
+       options?: { ssr?: boolean },
     ) => Promise<TransformResult> | TransformResult
   >
 }

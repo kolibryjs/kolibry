@@ -5,31 +5,30 @@ import type { Connect } from 'dep-types/connect'
 import { createDebugger } from '../../utils'
 
 export function htmlFallbackMiddleware(
-  root: string,
-  spaFallback: boolean,
+   root: string,
+   spaFallback: boolean,
 ): Connect.NextHandleFunction {
-  const historyHtmlFallbackMiddleware = history({
-    logger: createDebugger('kolibry:html-fallback'),
-    // support /dir/ without explicit index.html
-    rewrites: [
-      {
-        from: /\/$/,
-        to({ parsedUrl, request }: any) {
-          const rewritten =
-            decodeURIComponent(parsedUrl.pathname) + 'index.html'
+   const historyHtmlFallbackMiddleware = history({
+      logger: createDebugger('kolibry:html-fallback'),
+      // support /dir/ without explicit index.html
+      rewrites: [
+         {
+            from: /\/$/,
+            to({ parsedUrl, request }: any) {
+               const rewritten
+            = `${decodeURIComponent(parsedUrl.pathname)}index.html`
 
-          if (fs.existsSync(path.join(root, rewritten))) {
-            return rewritten
-          }
+               if (fs.existsSync(path.join(root, rewritten)))
+                  return rewritten
 
-          return spaFallback ? `/index.html` : request.url
-        },
-      },
-    ],
-  })
+               return spaFallback ? '/index.html' : request.url
+            },
+         },
+      ],
+   })
 
-  // Keep the named function. The name is visible in debug logs via `DEBUG=connect:dispatcher ...`
-  return function kolibryHtmlFallbackMiddleware(req, res, next) {
-    return historyHtmlFallbackMiddleware(req, res, next)
-  }
+   // Keep the named function. The name is visible in debug logs via `DEBUG=connect:dispatcher ...`
+   return function kolibryHtmlFallbackMiddleware(req, res, next) {
+      return historyHtmlFallbackMiddleware(req, res, next)
+   }
 }

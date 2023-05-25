@@ -1,20 +1,20 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`fixture > transform 1`] = `
-"import * as __vite_glob_1_0 from \\"./modules/a.ts\\";import * as __vite_glob_1_1 from \\"./modules/b.ts\\";import * as __vite_glob_1_2 from \\"./modules/index.ts\\";import { name as __vite_glob_3_0 } from \\"./modules/a.ts\\";import { name as __vite_glob_3_1 } from \\"./modules/b.ts\\";import { name as __vite_glob_3_2 } from \\"./modules/index.ts\\";import { default as __vite_glob_5_0 } from \\"./modules/a.ts?raw\\";import { default as __vite_glob_5_1 } from \\"./modules/b.ts?raw\\";import \\"types/importMeta\\";
+"import * as __kolibry_glob_1_0 from \\"./modules/a.ts\\";import * as __kolibry_glob_1_1 from \\"./modules/b.ts\\";import * as __kolibry_glob_1_2 from \\"./modules/index.ts\\";import { name as __kolibry_glob_3_0 } from \\"./modules/a.ts\\";import { name as __kolibry_glob_3_1 } from \\"./modules/b.ts\\";import { name as __kolibry_glob_3_2 } from \\"./modules/index.ts\\";import { default as __kolibry_glob_5_0 } from \\"./modules/a.ts?raw\\";import { default as __kolibry_glob_5_1 } from \\"./modules/b.ts?raw\\";import \\"types/importMeta\\";
 export const basic = /* #__PURE__ */ Object.assign({\\"./modules/a.ts\\": () => import(\\"./modules/a.ts\\"),\\"./modules/b.ts\\": () => import(\\"./modules/b.ts\\"),\\"./modules/index.ts\\": () => import(\\"./modules/index.ts\\")});
-export const basicEager = /* #__PURE__ */ Object.assign({\\"./modules/a.ts\\": __vite_glob_1_0,\\"./modules/b.ts\\": __vite_glob_1_1,\\"./modules/index.ts\\": __vite_glob_1_2
+export const basicEager = /* #__PURE__ */ Object.assign({\\"./modules/a.ts\\": __kolibry_glob_1_0,\\"./modules/b.ts\\": __kolibry_glob_1_1,\\"./modules/index.ts\\": __kolibry_glob_1_2
 
 });
 export const ignore = /* #__PURE__ */ Object.assign({\\"./modules/a.ts\\": () => import(\\"./modules/a.ts\\"),\\"./modules/b.ts\\": () => import(\\"./modules/b.ts\\")});
-export const namedEager = /* #__PURE__ */ Object.assign({\\"./modules/a.ts\\": __vite_glob_3_0,\\"./modules/b.ts\\": __vite_glob_3_1,\\"./modules/index.ts\\": __vite_glob_3_2
+export const namedEager = /* #__PURE__ */ Object.assign({\\"./modules/a.ts\\": __kolibry_glob_3_0,\\"./modules/b.ts\\": __kolibry_glob_3_1,\\"./modules/index.ts\\": __kolibry_glob_3_2
 
 
 });
 export const namedDefault = /* #__PURE__ */ Object.assign({\\"./modules/a.ts\\": () => import(\\"./modules/a.ts\\").then(m => m[\\"default\\"]),\\"./modules/b.ts\\": () => import(\\"./modules/b.ts\\").then(m => m[\\"default\\"]),\\"./modules/index.ts\\": () => import(\\"./modules/index.ts\\").then(m => m[\\"default\\"])
 
 });
-export const eagerAs = /* #__PURE__ */ Object.assign({\\"./modules/a.ts\\": __vite_glob_5_0,\\"./modules/b.ts\\": __vite_glob_5_1
+export const eagerAs = /* #__PURE__ */ Object.assign({\\"./modules/a.ts\\": __kolibry_glob_5_0,\\"./modules/b.ts\\": __kolibry_glob_5_1
 
 
 });
@@ -55,20 +55,20 @@ export const cleverCwd2 = /* #__PURE__ */ Object.assign({\\"./modules/a.ts\\": (
 `;
 
 exports[`fixture > transform with restoreQueryExtension 1`] = `
-"import * as __vite_glob_1_0 from \\"./modules/a.ts\\";import * as __vite_glob_1_1 from \\"./modules/b.ts\\";import * as __vite_glob_1_2 from \\"./modules/index.ts\\";import { name as __vite_glob_3_0 } from \\"./modules/a.ts\\";import { name as __vite_glob_3_1 } from \\"./modules/b.ts\\";import { name as __vite_glob_3_2 } from \\"./modules/index.ts\\";import { default as __vite_glob_5_0 } from \\"./modules/a.ts?raw\\";import { default as __vite_glob_5_1 } from \\"./modules/b.ts?raw\\";import \\"types/importMeta\\";
+"import * as __kolibry_glob_1_0 from \\"./modules/a.ts\\";import * as __kolibry_glob_1_1 from \\"./modules/b.ts\\";import * as __kolibry_glob_1_2 from \\"./modules/index.ts\\";import { name as __kolibry_glob_3_0 } from \\"./modules/a.ts\\";import { name as __kolibry_glob_3_1 } from \\"./modules/b.ts\\";import { name as __kolibry_glob_3_2 } from \\"./modules/index.ts\\";import { default as __kolibry_glob_5_0 } from \\"./modules/a.ts?raw\\";import { default as __kolibry_glob_5_1 } from \\"./modules/b.ts?raw\\";import \\"types/importMeta\\";
 export const basic = /* #__PURE__ */ Object.assign({\\"./modules/a.ts\\": () => import(\\"./modules/a.ts\\"),\\"./modules/b.ts\\": () => import(\\"./modules/b.ts\\"),\\"./modules/index.ts\\": () => import(\\"./modules/index.ts\\")});
-export const basicEager = /* #__PURE__ */ Object.assign({\\"./modules/a.ts\\": __vite_glob_1_0,\\"./modules/b.ts\\": __vite_glob_1_1,\\"./modules/index.ts\\": __vite_glob_1_2
+export const basicEager = /* #__PURE__ */ Object.assign({\\"./modules/a.ts\\": __kolibry_glob_1_0,\\"./modules/b.ts\\": __kolibry_glob_1_1,\\"./modules/index.ts\\": __kolibry_glob_1_2
 
 });
 export const ignore = /* #__PURE__ */ Object.assign({\\"./modules/a.ts\\": () => import(\\"./modules/a.ts\\"),\\"./modules/b.ts\\": () => import(\\"./modules/b.ts\\")});
-export const namedEager = /* #__PURE__ */ Object.assign({\\"./modules/a.ts\\": __vite_glob_3_0,\\"./modules/b.ts\\": __vite_glob_3_1,\\"./modules/index.ts\\": __vite_glob_3_2
+export const namedEager = /* #__PURE__ */ Object.assign({\\"./modules/a.ts\\": __kolibry_glob_3_0,\\"./modules/b.ts\\": __kolibry_glob_3_1,\\"./modules/index.ts\\": __kolibry_glob_3_2
 
 
 });
 export const namedDefault = /* #__PURE__ */ Object.assign({\\"./modules/a.ts\\": () => import(\\"./modules/a.ts\\").then(m => m[\\"default\\"]),\\"./modules/b.ts\\": () => import(\\"./modules/b.ts\\").then(m => m[\\"default\\"]),\\"./modules/index.ts\\": () => import(\\"./modules/index.ts\\").then(m => m[\\"default\\"])
 
 });
-export const eagerAs = /* #__PURE__ */ Object.assign({\\"./modules/a.ts\\": __vite_glob_5_0,\\"./modules/b.ts\\": __vite_glob_5_1
+export const eagerAs = /* #__PURE__ */ Object.assign({\\"./modules/a.ts\\": __kolibry_glob_5_0,\\"./modules/b.ts\\": __kolibry_glob_5_1
 
 
 });

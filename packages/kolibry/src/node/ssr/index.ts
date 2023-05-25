@@ -6,15 +6,15 @@ export type SSRFormat = 'esm' | 'cjs'
 export type SsrDepOptimizationOptions = DepOptimizationConfig
 
 export interface SSROptions {
-  noExternal?: string | RegExp | (string | RegExp)[] | true
-  external?: string[]
-  /**
+   noExternal?: string | RegExp | (string | RegExp)[] | true
+   external?: string[]
+   /**
    * Define the target for the ssr build. The browser field in package.json
    * is ignored for node but used if webworker is the target
    * @default 'node'
    */
-  target?: SSRTarget
-  /**
+   target?: SSRTarget
+   /**
    * Define the format for the ssr build. Since Kolibry the SSR build generates ESM by default.
    * `'cjs'` can be selected to generate a CJS build, but it isn't recommended. This option is
    * left marked as experimental to give users more time to update to ESM. CJS builds requires
@@ -22,8 +22,8 @@ export interface SSROptions {
    * @experimental
    * @default 'esm'
    */
-  format?: SSRFormat
-  /**
+   format?: SSRFormat
+   /**
    * Control over which dependencies are optimized during SSR and esbuild options
    * During build:
    *   no external CJS dependencies are optimized by default
@@ -31,35 +31,35 @@ export interface SSROptions {
    *   explicit no external CJS dependencies are optimized by default
    * @experimental
    */
-  optimizeDeps?: SsrDepOptimizationOptions
+   optimizeDeps?: SsrDepOptimizationOptions
 }
 
 export interface ResolvedSSROptions extends SSROptions {
-  target: SSRTarget
-  format: SSRFormat
-  optimizeDeps: SsrDepOptimizationOptions
+   target: SSRTarget
+   format: SSRFormat
+   optimizeDeps: SsrDepOptimizationOptions
 }
 
 export function resolveSSROptions(
-  ssr: SSROptions | undefined,
-  preserveSymlinks: boolean,
-  buildSsrCjsExternalHeuristics?: boolean,
+   ssr: SSROptions | undefined,
+   preserveSymlinks: boolean,
+   buildSsrCjsExternalHeuristics?: boolean,
 ): ResolvedSSROptions {
-  ssr ??= {}
-  const optimizeDeps = ssr.optimizeDeps ?? {}
-  const format: SSRFormat = buildSsrCjsExternalHeuristics ? 'cjs' : 'esm'
-  const target: SSRTarget = 'node'
-  return {
-    format,
-    target,
-    ...ssr,
-    optimizeDeps: {
-      disabled: true,
-      ...optimizeDeps,
-      esbuildOptions: {
-        preserveSymlinks,
-        ...optimizeDeps.esbuildOptions,
+   ssr ??= {}
+   const optimizeDeps = ssr.optimizeDeps ?? {}
+   const format: SSRFormat = buildSsrCjsExternalHeuristics ? 'cjs' : 'esm'
+   const target: SSRTarget = 'node'
+   return {
+      format,
+      target,
+      ...ssr,
+      optimizeDeps: {
+         disabled: true,
+         ...optimizeDeps,
+         esbuildOptions: {
+            preserveSymlinks,
+            ...optimizeDeps.esbuildOptions,
+         },
       },
-    },
-  }
+   }
 }

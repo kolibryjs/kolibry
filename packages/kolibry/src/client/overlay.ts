@@ -6,7 +6,7 @@ declare const __BASE__: string
 const base = __BASE__ || '/'
 
 // set :host styles to make playwright detect the element as visible
-const template = /*html*/ `
+const template = /* html */ `
 <style>
 :host {
   position: fixed;
@@ -139,76 +139,77 @@ const codeframeRE = /^(?:>?\s+\d+\s+\|.*|\s+\|\s*\^.*)\r?\n/gm
 // `HTMLElement` was not originally defined.
 const { HTMLElement = class {} as typeof globalThis.HTMLElement } = globalThis
 export class ErrorOverlay extends HTMLElement {
-  root: ShadowRoot
+   root: ShadowRoot
 
-  constructor(err: ErrorPayload['err'], links = true) {
-    super()
-    this.root = this.attachShadow({ mode: 'open' })
-    this.root.innerHTML = template
+   constructor(err: ErrorPayload['err'], links = true) {
+      super()
+      this.root = this.attachShadow({ mode: 'open' })
+      this.root.innerHTML = template
 
-    codeframeRE.lastIndex = 0
-    const hasFrame = err.frame && codeframeRE.test(err.frame)
-    const message = hasFrame
-      ? err.message.replace(codeframeRE, '')
-      : err.message
-    if (err.plugin) {
-      this.text('.plugin', `[plugin:${err.plugin}] `)
-    }
-    this.text('.message-body', message.trim())
+      codeframeRE.lastIndex = 0
+      const hasFrame = err.frame && codeframeRE.test(err.frame)
+      const message = hasFrame
+         ? err.message.replace(codeframeRE, '')
+         : err.message
+      if (err.plugin)
+         this.text('.plugin', `[plugin:${err.plugin}] `)
 
-    const [file] = (err.loc?.file || err.id || 'unknown file').split(`?`)
-    if (err.loc) {
-      this.text('.file', `${file}:${err.loc.line}:${err.loc.column}`, links)
-    } else if (err.id) {
-      this.text('.file', file)
-    }
+      this.text('.message-body', message.trim())
 
-    if (hasFrame) {
-      this.text('.frame', err.frame!.trim())
-    }
-    this.text('.stack', err.stack, links)
+      const [file] = (err.loc?.file || err.id || 'unknown file').split('?')
+      if (err.loc)
+         this.text('.file', `${file}:${err.loc.line}:${err.loc.column}`, links)
 
-    this.root.querySelector('.window')!.addEventListener('click', (e) => {
-      e.stopPropagation()
-    })
-    this.addEventListener('click', () => {
-      this.close()
-    })
-  }
+      else if (err.id)
+         this.text('.file', file)
 
-  text(selector: string, text: string, linkFiles = false): void {
-    const el = this.root.querySelector(selector)!
-    if (!linkFiles) {
-      el.textContent = text
-    } else {
-      let curIndex = 0
-      let match: RegExpExecArray | null
-      fileRE.lastIndex = 0
-      while ((match = fileRE.exec(text))) {
-        const { 0: file, index } = match
-        if (index != null) {
-          const frag = text.slice(curIndex, index)
-          el.appendChild(document.createTextNode(frag))
-          const link = document.createElement('a')
-          link.textContent = file
-          link.className = 'file-link'
-          link.onclick = () => {
-            fetch(`${base}__open-in-editor?file=` + encodeURIComponent(file))
-          }
-          el.appendChild(link)
-          curIndex += frag.length + file.length
-        }
+      if (hasFrame)
+         this.text('.frame', err.frame!.trim())
+
+      this.text('.stack', err.stack, links)
+
+      this.root.querySelector('.window')!.addEventListener('click', (e) => {
+         e.stopPropagation()
+      })
+      this.addEventListener('click', () => {
+         this.close()
+      })
+   }
+
+   text(selector: string, text: string, linkFiles = false): void {
+      const el = this.root.querySelector(selector)!
+      if (!linkFiles) {
+         el.textContent = text
       }
-    }
-  }
+      else {
+         let curIndex = 0
+         let match: RegExpExecArray | null
+         fileRE.lastIndex = 0
 
-  close(): void {
-    this.parentNode?.removeChild(this)
-  }
+         while ((match = fileRE.exec(text))) {
+            const { 0: file, index } = match
+            if (index != null) {
+               const frag = text.slice(curIndex, index)
+               el.appendChild(document.createTextNode(frag))
+               const link = document.createElement('a')
+               link.textContent = file
+               link.className = 'file-link'
+               link.onclick = () => {
+                  fetch(`${base}__open-in-editor?file=${encodeURIComponent(file)}`)
+               }
+               el.appendChild(link)
+               curIndex += frag.length + file.length
+            }
+         }
+      }
+   }
+
+   close(): void {
+      this.parentNode?.removeChild(this)
+   }
 }
 
 export const overlayId = 'kolibry-error-overlay'
 const { customElements } = globalThis // Ensure `customElements` is defined before the next line.
-if (customElements && !customElements.get(overlayId)) {
-  customElements.define(overlayId, ErrorOverlay)
-}
+if (customElements && !customElements.get(overlayId))
+   customElements.define(overlayId, ErrorOverlay)

@@ -5,7 +5,7 @@ import type { Logger } from '../logger'
 import { createDebugger } from '../utils'
 
 const debug = createDebugger('kolibry:sourcemap', {
-  onlyWhenFocused: true,
+   onlyWhenFocused: true,
 })
 
 // Virtual modules should be prefixed with a null byte to avoid a
@@ -14,109 +14,108 @@ const debug = createDebugger('kolibry:sourcemap', {
 const virtualSourceRE = /^(?:dep:|browser-external:|virtual:)|\0/
 
 interface SourceMapLike {
-  sources: string[]
-  sourcesContent?: (string | null)[]
-  sourceRoot?: string
+   sources: string[]
+   sourcesContent?: (string | null)[]
+   sourceRoot?: string
 }
 
 export async function injectSourcesContent(
-  map: SourceMapLike,
-  file: string,
-  logger: Logger,
+   map: SourceMapLike,
+   file: string,
+   logger: Logger,
 ): Promise<void> {
-  let sourceRoot: string | undefined
-  try {
-    // The source root is undefined for virtual modules and permission errors.
-    sourceRoot = await fs.realpath(
-      path.resolve(path.dirname(file), map.sourceRoot || ''),
-    )
-  } catch {}
+   let sourceRoot: string | undefined
+   try {
+      // The source root is undefined for virtual modules and permission errors.
+      sourceRoot = await fs.realpath(
+         path.resolve(path.dirname(file), map.sourceRoot || ''),
+      )
+   }
+   catch {}
 
-  const missingSources: string[] = []
-  map.sourcesContent = await Promise.all(
-    map.sources.map((sourcePath) => {
-      if (sourcePath && !virtualSourceRE.test(sourcePath)) {
-        sourcePath = decodeURI(sourcePath)
-        if (sourceRoot) {
-          sourcePath = path.resolve(sourceRoot, sourcePath)
-        }
-        return fs.readFile(sourcePath, 'utf-8').catch(() => {
-          missingSources.push(sourcePath)
-          return null
-        })
-      }
-      return null
-    }),
-  )
+   const missingSources: string[] = []
+   map.sourcesContent = await Promise.all(
+      map.sources.map((sourcePath) => {
+         if (sourcePath && !virtualSourceRE.test(sourcePath)) {
+            sourcePath = decodeURI(sourcePath)
+            if (sourceRoot)
+               sourcePath = path.resolve(sourceRoot, sourcePath)
 
-  // Use this command…
-  //    DEBUG="kolibry:sourcemap" kolibry build
-  // …to log the missing sources.
-  if (missingSources.length) {
-    logger.warnOnce(`Sourcemap for "${file}" points to missing source files`)
-    debug?.(`Missing sources:\n  ` + missingSources.join(`\n  `))
-  }
+            return fs.readFile(sourcePath, 'utf-8').catch(() => {
+               missingSources.push(sourcePath)
+               return null
+            })
+         }
+         return null
+      }),
+   )
+
+   // Use this command…
+   //    DEBUG="kolibry:sourcemap" kolibry build
+   // …to log the missing sources.
+   if (missingSources.length) {
+      logger.warnOnce(`Sourcemap for "${file}" points to missing source files`)
+      debug?.(`Missing sources:\n  ${missingSources.join('\n  ')}`)
+   }
 }
 
 export function genSourceMapUrl(map: SourceMap | string): string {
-  if (typeof map !== 'string') {
-    map = JSON.stringify(map)
-  }
-  return `data:application/json;base64,${Buffer.from(map).toString('base64')}`
+   if (typeof map !== 'string')
+      map = JSON.stringify(map)
+
+   return `data:application/json;base64,${Buffer.from(map).toString('base64')}`
 }
 
 export function getCodeWithSourcemap(
-  type: 'js' | 'css',
-  code: string,
-  map: SourceMap,
+   type: 'js' | 'css',
+   code: string,
+   map: SourceMap,
 ): string {
-  if (debug) {
-    code += `\n/*${JSON.stringify(map, null, 2).replace(/\*\//g, '*\\/')}*/\n`
-  }
+   if (debug)
+      code += `\n/*${JSON.stringify(map, null, 2).replace(/\*\//g, '*\\/')}*/\n`
 
-  if (type === 'js') {
-    code += `\n//# sourceMappingURL=${genSourceMapUrl(map)}`
-  } else if (type === 'css') {
-    code += `\n/*# sourceMappingURL=${genSourceMapUrl(map)} */`
-  }
+   if (type === 'js')
+      code += `\n//# sourceMappingURL=${genSourceMapUrl(map)}`
+   else if (type === 'css')
+      code += `\n/*# sourceMappingURL=${genSourceMapUrl(map)} */`
 
-  return code
+   return code
 }
 
 export function applySourcemapIgnoreList(
-  map: ExistingRawSourceMap,
-  sourcemapPath: string,
-  sourcemapIgnoreList: (sourcePath: string, sourcemapPath: string) => boolean,
-  logger?: Logger,
+   map: ExistingRawSourceMap,
+   sourcemapPath: string,
+   sourcemapIgnoreList: (sourcePath: string, sourcemapPath: string) => boolean,
+   logger?: Logger,
 ): void {
-  let { x_google_ignoreList } = map
-  if (x_google_ignoreList === undefined) {
-    x_google_ignoreList = []
-  }
-  for (
-    let sourcesIndex = 0;
-    sourcesIndex < map.sources.length;
-    ++sourcesIndex
-  ) {
-    const sourcePath = map.sources[sourcesIndex]
-    if (!sourcePath) continue
+   let { x_google_ignoreList } = map
+   if (x_google_ignoreList === undefined)
+      x_google_ignoreList = []
 
-    const ignoreList = sourcemapIgnoreList(
-      path.isAbsolute(sourcePath)
-        ? sourcePath
-        : path.resolve(path.dirname(sourcemapPath), sourcePath),
-      sourcemapPath,
-    )
-    if (logger && typeof ignoreList !== 'boolean') {
-      logger.warn('sourcemapIgnoreList function must return a boolean.')
-    }
+   for (
+      let sourcesIndex = 0;
+      sourcesIndex < map.sources.length;
+      ++sourcesIndex
+   ) {
+      const sourcePath = map.sources[sourcesIndex]
+      if (!sourcePath)
+         continue
 
-    if (ignoreList && !x_google_ignoreList.includes(sourcesIndex)) {
-      x_google_ignoreList.push(sourcesIndex)
-    }
-  }
+      const ignoreList = sourcemapIgnoreList(
+         path.isAbsolute(sourcePath)
+            ? sourcePath
+            : path.resolve(path.dirname(sourcemapPath), sourcePath),
+         sourcemapPath,
+      )
+      if (logger && typeof ignoreList !== 'boolean')
+         logger.warn('sourcemapIgnoreList function must return a boolean.')
 
-  if (x_google_ignoreList.length > 0) {
-    if (!map.x_google_ignoreList) map.x_google_ignoreList = x_google_ignoreList
-  }
+      if (ignoreList && !x_google_ignoreList.includes(sourcesIndex))
+         x_google_ignoreList.push(sourcesIndex)
+   }
+
+   if (x_google_ignoreList.length > 0) {
+      if (!map.x_google_ignoreList)
+         map.x_google_ignoreList = x_google_ignoreList
+   }
 }
