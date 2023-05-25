@@ -290,7 +290,7 @@ export function buildEsbuildPlugin(config: ResolvedConfig): Plugin {
    return {
       name: 'kolibry:esbuild-transpile',
       async renderChunk(code, chunk, opts) {
-      // @ts-expect-error injected by @kolibryjs/plugin-legacy
+      // @ts-expect-error injected by @kolibryjs/legacy-plugin
          if (opts.__kolibry_skip_esbuild__)
             return null
 
@@ -347,8 +347,8 @@ export function resolveEsbuildTranspileOptions(
       target: target || undefined,
       format: rollupToEsbuildFormatMap[format],
       // the final build should always support dynamic import and import.meta.
-      // if they need to be polyfilled, plugin-legacy should be used.
-      // plugin-legacy detects these two features when checking for modern code.
+      // if they need to be polyfilled, legacy-plugin should be used.
+      // legacy-plugin detects these two features when checking for modern code.
       supported: {
          'dynamic-import': true,
          'import-meta': true,
